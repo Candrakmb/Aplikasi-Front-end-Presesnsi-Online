@@ -6,6 +6,7 @@
       </div>
       <div class="content">
         <div id="map" style="width: auto; height: 300px;"></div>
+        <textarea :hidden="buttonActive" class="textarea textarea--transparent" rows="3" placeholder="Anda diluar area absen"></textarea>
         <v-ons-button modifier="large" :disabled="!buttonActive" style="margin: 6px 0">Absen</v-ons-button>
       </div>
       </v-ons-card>
@@ -38,7 +39,7 @@
       marker: null,
       markerUser: null,
       buttonActive: false,
-      range: 1000, // jarak range dalam meter
+      range: 2000, // jarak range dalam meter
       userlatlng: null // inisialisasi koordinat pengguna
     };
   },
@@ -60,20 +61,32 @@
     
     // buat event listener pada peta untuk menghitung jarak dan lokasi pengguna
     const getUserPosition = new Promise((resolve, reject) => {
-      navigator.geolocation.watchPosition((position) => {
-        const userLatLng = L.latLng(position.coords.latitude, position.coords.longitude);
-        this.userlatlng = userLatLng;
-        this.map.setView(userLatLng, 13);
-        resolve(userLatLng);
-      }, (error) => {
-        reject(error);
-      });
+      navigator.geolocation.watchPosition(
+        position => {
+          const userLatLng = L.latLng(
+            position.coords.latitude,
+            position.coords.longitude
+          );
+          this.userlatlng = userLatLng;
+          this.map.setView(userLatLng, 13);
+          resolve(userLatLng);
+        },
+        error => {
+          reject(error);
+        },
+        { enableHighAccuracy: true } // aktifkan mode akurasi tinggi
+      );
     });
 
     // setelah posisi pengguna diperoleh, mulai mendengarkan event mousemove
     // cek jarak antara pengguna dan range setiap perubahan lokasi pengguna
     this.map.on('locationfound', e => {
       const userlatlng = e.latlng;
+
+      if (this.markerUser) {
+        this.map.removeLayer(this.markerUser);
+      }
+      
       this.markerUser=L.marker(userlatlng ,{
         icon: L.icon({
               iconUrl: 'person.png',
@@ -84,9 +97,6 @@
 
       const distance = haversineDistance(userlatlng.lat, userlatlng.lng, range.getLatLng().lat, range.getLatLng().lng);
       this.buttonActive = distance <= this.range;
-      if (distance > 2000) {
-        $ons.notification.alert('Anda tidak berada di area yang diinginkan!');
-      }
     });
 
     // minta izin dan perbarui lokasi pengguna setiap 5 detik
