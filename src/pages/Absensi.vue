@@ -15,24 +15,10 @@
   
   <script>
   import L from 'leaflet';
-  
-
-  function haversineDistance(lat1, lon1, lat2, lon2) {
-    const R = 6371e3; // radius bumi dalam meter
-    const phi1 = lat1 * Math.PI / 180;
-    const phi2 = lat2 * Math.PI / 180;
-    const deltaPhi = (lat2 - lat1) * Math.PI / 180;
-    const deltaLambda = (lon2 - lon1) * Math.PI / 180;
-
-    const a = Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
-            Math.cos(phi1) * Math.cos(phi2) *
-            Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-    const distance = R * c;
-    return distance;
-  }
+  import personIcon from '../assets/person.png';
+  import lokasi from '../assets/location.png';
   export default {
+ 
   data() {
     return {
       map: null,
@@ -51,7 +37,12 @@
     }).addTo(this.map);
     
     // tambahkan marker dan range pada peta
-    this.marker = L.marker([-7.329268254466761, 112.78410458248831]).addTo(this.map);
+    this.marker = L.marker([-7.329268254466761, 112.78410458248831], {
+      icon: L.icon({
+              iconUrl: lokasi,
+              iconSize: [40, 41], // Ubah ukuran ikon sesuai kebutuhan
+              iconAnchor: [12, 41]
+              })}).addTo(this.map);
     const range = L.circle([-7.329268254466761, 112.78410458248831], {
       radius: this.range,
       color: 'blue',
@@ -89,20 +80,39 @@
       
       this.markerUser=L.marker(userlatlng ,{
         icon: L.icon({
-              iconUrl: 'person.png',
-              iconSize: this.dynamicSize,
-              iconAnchor: this.dynamicAnchor
+              iconUrl: personIcon,
+              iconSize: [40, 41], // Ubah ukuran ikon sesuai kebutuhan
+              iconAnchor: [12, 41]
               })
       }).addTo(this.map); 
 
-      const distance = haversineDistance(userlatlng.lat, userlatlng.lng, range.getLatLng().lat, range.getLatLng().lng);
+      const distance = this.haversineDistance(userlatlng.lat, userlatlng.lng, range.getLatLng().lat, range.getLatLng().lng);
       this.buttonActive = distance <= this.range;
     });
 
     // minta izin dan perbarui lokasi pengguna setiap 5 detik
     this.map.locate({ setView: false, watch: true, enableHighAccuracy: true, maximumAge: 0 });
     setInterval(() => this.map.locate({ setView: false, watch: true, enableHighAccuracy: true, maximumAge: 0 }), 5000);
+    
   },
+  methods: {
+    haversineDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371e3; // radius bumi dalam meter
+        const phi1 = lat1 * Math.PI / 180;
+        const phi2 = lat2 * Math.PI / 180;
+        const deltaPhi = (lat2 - lat1) * Math.PI / 180;
+        const deltaLambda = (lon2 - lon1) * Math.PI / 180;
+
+        const a = Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
+                Math.cos(phi1) * Math.cos(phi2) *
+                Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        const distance = R * c;
+        return distance;
+      }
+  }
+  
 };
   </script>
   

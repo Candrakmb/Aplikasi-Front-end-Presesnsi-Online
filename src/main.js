@@ -11,7 +11,9 @@ import VueOnsen from 'vue-onsenui'; // For UMD
 import storeLike from './store.js';
 import CustomToolbar from './partials/CustomToolbar.vue';
 import AppNavigator from './AppNavigator.vue';
+import Login from './Login.vue'
 import 'leaflet/dist/leaflet.css';
+import eventBus from './eventBus';
 
 Vue.use(Vuex);
 Vue.use(VueOnsen);
@@ -22,7 +24,16 @@ Vue.component('custom-toolbar', CustomToolbar); // Common toolbar
 
 new Vue({
   el: '#app',
-  render: h => h(AppNavigator),
+  data: {
+    loggedIn: false
+  },
+  render: function (h) {
+    if (this.loggedIn) {
+      return h(AppNavigator);
+    } else {
+      return h(Login);
+    }
+  },
   store: new Vuex.Store(storeLike),
   beforeCreate() {
     // Shortcut for Material Design
@@ -33,5 +44,25 @@ new Vue({
       document.documentElement.setAttribute('onsflag-iphonex-portrait', '');
       document.documentElement.setAttribute('onsflag-iphonex-landscape', '');
     }
+  },
+  created() {
+    const loggedInStatus = localStorage.getItem('loggedIn');
+
+    // Jika ada status login yang tersimpan, gunakan nilainya
+    if (loggedInStatus) {
+      this.loggedIn = JSON.parse(loggedInStatus);
+    }
+
+    eventBus.$on('loginSuccess', () => {
+      this.loggedIn = true;
+      // Simpan status login di Local Storage
+      localStorage.setItem('loggedIn', JSON.stringify(true));
+    });
+
+    eventBus.$on('logout', () => {
+      this.loggedIn = false;
+      // Hapus status login dari Local Storage saat logout
+      localStorage.removeItem('loggedIn');
+    });
   }
 });

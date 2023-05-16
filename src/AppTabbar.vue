@@ -22,7 +22,6 @@
 </template>
 
 <script>
-import Camera from './pages/Camera.vue';
 import Home from './pages/Home.vue';
 import Absensi from './pages/Absensi.vue';
 import Animations from './pages/Animations.vue';
@@ -43,14 +42,6 @@ export default {
       animationOptions: {},
       topPosition: 0,
       tabs: [
-        {
-          label: this.md ? null : 'Camera',
-          icon: 'ion-camera, material:md-camera',
-          page: Camera,
-          theme: red,
-          style: this.md ? { maxWidth: '60px' } : {},
-          top: -105 // Toolbar + Tabbar heights
-        },
         {
           label: 'Home',
           icon: this.md ? null : 'ion-home',
