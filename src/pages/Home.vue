@@ -1,59 +1,35 @@
 <template>
   <v-ons-page>
     <p class="intro">
-      This is a kitchen sink example that shows off the Vue bindings for Onsen UI.<br><br>
+      Selamat datang budi berikut kegiatan untuk anda .<br><br>
     </p>
 
     <v-ons-card v-for="page of pages" :key="page.label"
       @click="push(page.component, page.label)"
     >
-      <div class="title">{{ page.label }}</div>
-      <div class="content">{{ page.desc }}</div>
+      <div class="title">{{ page.kegiatan }}</div>
+      <div class="content"><v-ons-list>
+          <v-ons-list-header>Deskripsi</v-ons-list-header>
+          <v-ons-list-item>Lokasi : {{ page.lokasi  }}</v-ons-list-item>
+          <v-ons-list-item>Tanggal : {{ page.tanggal }}</v-ons-list-item>
+        </v-ons-list></div>
     </v-ons-card>
   </v-ons-page>
 </template>
 
 <script>
-import PullHook from './PullHook.vue';
-import Dialogs from './Dialogs.vue';
-import Buttons from './Buttons.vue';
-import Carousel from './Carousel.vue';
-import InfiniteScroll from './InfiniteScroll.vue';
-import Progress from './Progress.vue';
+import Absensi from './Absensi.vue';
 
 export default {
   data () {
     return {
       pages: [
         {
-          component: PullHook,
-          label: 'Pull Hook',
-          desc: 'Simple "pull to refresh" functionality to update data.'
-        },
-        {
-          component: Dialogs,
-          label: 'Dialogs',
-          desc: 'Components and utility methods to display many types of dialogs.'
-        },
-        {
-          component: Buttons,
-          label: 'Buttons',
-          desc: 'Different styles for buttons, floating action buttons and speed dials.'
-        },
-        {
-          component: Carousel,
-          label: 'Carousel',
-          desc: 'Customizable carousel that can be optionally fullscreen.'
-        },
-        {
-          component: InfiniteScroll,
-          label: 'Infinite Scroll',
-          desc: 'Two types of infinite lists: "Load More" and "Lazy Repeat".'
-        },
-        {
-          component: Progress,
-          label: 'Progress',
-          desc: 'Linear progress, circular progress and spinners.'
+          component: Absensi,
+          label :'Absensi',
+          kegiatan: 'Penyuluhan tahan pangan',
+          lokasi: 'kemiri malo , bojonegoro',
+          tanggal: '20/08/23',
         }
       ]
     };

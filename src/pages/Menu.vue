@@ -22,7 +22,7 @@
       </v-ons-list-item>
     </v-ons-list>
 
-    <v-ons-list-title>Links</v-ons-list-title>
+    <!-- <v-ons-list-title>Links</v-ons-list-title>
     <v-ons-list>
       <v-ons-list-item v-for="item in links" :key="item.title"
         :modifier="md ? 'nodivider' : ''"
@@ -38,7 +38,7 @@
           <v-ons-icon icon="fa-external-link"></v-ons-icon>
         </div>
       </v-ons-list-item>
-    </v-ons-list>
+    </v-ons-list> -->
   </v-ons-page>
 </template>
 
@@ -55,46 +55,15 @@ export default {
   },
   data() {
     return {
-      links: [
-        {
-          title: 'Docs',
-          icon: 'ion-document-text',
-          url: 'https://onsen.io/v2/docs/guide/vue/'
-        },
-        {
-          title: 'Github',
-          icon: 'ion-social-github',
-          url: 'https://github.com/OnsenUI/OnsenUI'
-        },
-        {
-          title: 'Code',
-          icon: 'ion-code',
-          url: 'https://github.com/OnsenUI/vue-onsenui-kitchensink'
-        },
-        {
-          title: 'Forum',
-          icon: 'ion-chatboxes',
-          url: 'https://community.onsen.io/'
-        },
-        {
-          title: 'Twitter',
-          icon: 'ion-social-twitter',
-          url: 'https://twitter.com/Onsen_UI'
-        }
-      ],
       access: [
         {
           title: 'Home',
           icon: 'ion-home, material:md-home'
         },
         {
-          title: 'Forms',
-          icon: 'ion-edit, material:md-edit'
-        },
-        {
-          title: 'Animations',
+          title: 'History',
           icon: 'ion-film-marker, material: md-movie-alt'
-        }
+        },
       ]
     };
   }

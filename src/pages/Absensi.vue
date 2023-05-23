@@ -1,12 +1,16 @@
 <template>
     <v-ons-page>
+      <custom-toolbar v-bind="toolbarInfo"></custom-toolbar>
+
       <v-ons-card >
         <div class="title">
         penyuluhan di......
       </div>
       <div class="content">
         <div id="map" style="width: auto; height: 300px;"></div>
-        <textarea :hidden="buttonActive" class="textarea textarea--transparent" rows="3" placeholder="Anda diluar area absen"></textarea>
+        <div class="peringatan">
+          <span :hidden="buttonActive" class="alert error">Anda di luar area!</span>
+        </div>
         <v-ons-button modifier="large" :disabled="!buttonActive" style="margin: 6px 0">Absen</v-ons-button>
       </div>
       </v-ons-card>
@@ -17,6 +21,8 @@
   import L from 'leaflet';
   import personIcon from '../assets/person.png';
   import lokasi from '../assets/location.png';
+  import { kabupatenBojonegoro } from '../assets/mapping/bojonegoro.js';
+  import { test } from '../assets/mapping/test.js';
   export default {
  
   data() {
@@ -25,8 +31,9 @@
       marker: null,
       markerUser: null,
       buttonActive: false,
-      range: 2000, // jarak range dalam meter
-      userlatlng: null // inisialisasi koordinat pengguna
+      userlatlng: null, // inisialisasi koordinat pengguna
+      data: null,
+      geojson: null,
     };
   },
   mounted() {
@@ -35,82 +42,106 @@
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(this.map);
-    
-    // tambahkan marker dan range pada peta
-    this.marker = L.marker([-7.329268254466761, 112.78410458248831], {
-      icon: L.icon({
-              iconUrl: lokasi,
-              iconSize: [40, 41], // Ubah ukuran ikon sesuai kebutuhan
-              iconAnchor: [12, 41]
-              })}).addTo(this.map);
-    const range = L.circle([-7.329268254466761, 112.78410458248831], {
-      radius: this.range,
-      color: 'blue',
-      opacity: 0.5,
-      fillOpacity: 0.1
+
+    // this.data = L.geoJSON(kabupatenBojonegoro, {
+    //     filter: function(feature) {
+    //         return feature.properties.name === 'ngraho_ngraho';
+    //     }
+    // }).addTo(this.map);
+    this.data = L.geoJSON(test, {
+        filter: function(feature) {
+            return feature.properties.name === 'surabaya_surabaya';
+        }
     }).addTo(this.map);
-    
-    // buat event listener pada peta untuk menghitung jarak dan lokasi pengguna
-    const getUserPosition = new Promise((resolve, reject) => {
-      navigator.geolocation.watchPosition(
-        position => {
-          const userLatLng = L.latLng(
-            position.coords.latitude,
-            position.coords.longitude
-          );
-          this.userlatlng = userLatLng;
-          this.map.setView(userLatLng, 13);
-          resolve(userLatLng);
-        },
-        error => {
-          reject(error);
-        },
-        { enableHighAccuracy: true } // aktifkan mode akurasi tinggi
-      );
-    });
 
-    // setelah posisi pengguna diperoleh, mulai mendengarkan event mousemove
-    // cek jarak antara pengguna dan range setiap perubahan lokasi pengguna
-    this.map.on('locationfound', e => {
-      const userlatlng = e.latlng;
+        this.getUserPosition();
 
-      if (this.markerUser) {
-        this.map.removeLayer(this.markerUser);
-      }
+        // Mulai mendengarkan perubahan lokasi pengguna setelah mendapatkan lokasi pengguna
+        this.map.on('locationfound', e => {
+          const userlatlng = e.latlng;
       
-      this.markerUser=L.marker(userlatlng ,{
-        icon: L.icon({
-              iconUrl: personIcon,
-              iconSize: [40, 41], // Ubah ukuran ikon sesuai kebutuhan
-              iconAnchor: [12, 41]
-              })
-      }).addTo(this.map); 
+          // Panggil fungsi untuk memeriksa jarak dan lokasi pengguna
+          this.checkUserLocation(userlatlng);
+        });
 
-      const distance = this.haversineDistance(userlatlng.lat, userlatlng.lng, range.getLatLng().lat, range.getLatLng().lng);
-      this.buttonActive = distance <= this.range;
-    });
-
-    // minta izin dan perbarui lokasi pengguna setiap 5 detik
-    this.map.locate({ setView: false, watch: true, enableHighAccuracy: true, maximumAge: 0 });
-    setInterval(() => this.map.locate({ setView: false, watch: true, enableHighAccuracy: true, maximumAge: 0 }), 5000);
-    
+        // Perbarui lokasi pengguna setiap 5 detik
+        setInterval(() => this.getUserPosition(), 5000);
   },
   methods: {
-    haversineDistance(lat1, lon1, lat2, lon2) {
-        const R = 6371e3; // radius bumi dalam meter
-        const phi1 = lat1 * Math.PI / 180;
-        const phi2 = lat2 * Math.PI / 180;
-        const deltaPhi = (lat2 - lat1) * Math.PI / 180;
-        const deltaLambda = (lon2 - lon1) * Math.PI / 180;
+    generateCirclePolygon() {
+      var angleStep = (2 * Math.PI) / this.numPoints;
 
-        const a = Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
-                Math.cos(phi1) * Math.cos(phi2) *
-                Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-        const distance = R * c;
-        return distance;
+      for (var i = 0; i < this.numPoints; i++) {
+        var angle = i * angleStep;
+        var x = this.center[0] + (this.radius / (111320 * Math.cos(this.center[1] * Math.PI / 180))) * Math.cos(angle); // Konversi radius ke meter
+        var y = this.center[1] + (this.radius / 111320) * Math.sin(angle); // Konversi radius ke meter
+        this.coordinates.push([x, y]);
       }
+
+      // Menambahkan titik awal untuk menghasilkan polygon yang tertutup
+      this.coordinates.push(this.coordinates[0]);
+    },
+
+    getUserPosition() {
+  navigator.geolocation.getCurrentPosition(
+    position => {
+      const userLatLng = L.latLng(
+        position.coords.latitude,
+        position.coords.longitude
+      );
+      
+      if (!this.userlatlng || !this.userlatlng.equals(userLatLng)) {
+        // Hanya lakukan pengaturan ulang tampilan jika posisi pengguna berubah
+        this.userlatlng = userLatLng;
+
+        if (this.markerUser) {
+          this.map.removeLayer(this.markerUser);
+        }
+        
+        // Tambahkan marker pengguna baru
+        this.markerUser = L.marker(this.userlatlng, {
+          icon: L.icon({
+            iconUrl: personIcon,
+            iconSize: [40, 41],
+            iconAnchor: [12, 41]
+          })
+        }).addTo(this.map); 
+        
+        this.map.setView(this.userlatlng, 13);
+  
+        // Panggil fungsi untuk mengecek jarak dan lokasi pengguna
+        this.checkUserLocation(this.userlatlng);
+      }
+    },
+    error => {
+      console.error(error);
+    },
+    { enableHighAccuracy: true } // aktifkan mode akurasi tinggi
+  );
+},
+
+  checkUserLocation(userLatLng) {
+    this.buttonActive = this.data.getBounds().contains(userLatLng);
+    if (!this.buttonActive) {
+        this.$ons.notification.toast('Anda di Luar Area!', { timeout: 2000, animation: 'fall' });
+      }
+  },
+
+    // haversineDistance(lat1, lon1, lat2, lon2) {
+    //     const R = 6371e3; // radius bumi dalam meter
+    //     const phi1 = lat1 * Math.PI / 180;
+    //     const phi2 = lat2 * Math.PI / 180;
+    //     const deltaPhi = (lat2 - lat1) * Math.PI / 180;
+    //     const deltaLambda = (lon2 - lon1) * Math.PI / 180;
+
+    //     const a = Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
+    //     Math.cos(phi1) * Math.cos(phi2) *
+    //     Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
+    //     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    //     const distance = R * c;
+    //     return distance;
+    //   }
   }
   
 };
@@ -151,5 +182,18 @@
   margin-top: -10px;
   margin-left: -12px;
 }
+.peringatan{
+ padding: 20px;
+}
+.alert {
+  padding: 10px;
+  text-align: center;
+  position: relative;
+  color: white;
+  border-radius: 5px;
+  margin-left: 80px;
+  box-shadow: 10px 5px;
+}
+.error {background-color: #c90b0b;} /* Green */
   </style>
   

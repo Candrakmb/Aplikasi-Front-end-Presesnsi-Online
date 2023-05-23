@@ -23,8 +23,7 @@
 
 <script>
 import Home from './pages/Home.vue';
-import Absensi from './pages/Absensi.vue';
-import Animations from './pages/Animations.vue';
+import History from './pages/History.vue';
 
 // Just a linear interpolation formula
 const lerp = (x0, x1, t) => parseInt((1 - t) * x0 + t * x1, 10);
@@ -43,22 +42,16 @@ export default {
       topPosition: 0,
       tabs: [
         {
-          label: 'Home',
-          icon: this.md ? null : 'ion-home',
-          page: Home,
-          theme: red
-        },
+            label: 'History',
+            icon: this.md ? null : 'ion-film-marker',
+            page: History,
+            theme: purple
+          },
         {
-          label: 'Absensi',
-          icon: this.md ? null : 'ion-edit',
-          page: Absensi,
-          theme: blue
-        },
-        {
-          label: 'Anim',
-          icon: this.md ? null : 'ion-film-marker',
-          page: Animations,
-          theme: purple
+            label: 'Home',
+            icon: this.md ? null : 'ion-home',
+            page: Home,
+            theme: red
         }
       ]
     };
