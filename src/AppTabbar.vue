@@ -24,13 +24,13 @@
 <script>
 import Home from './pages/Home.vue';
 import History from './pages/History.vue';
+import Profil from './pages/Profil.vue';
 
 // Just a linear interpolation formula
 const lerp = (x0, x1, t) => parseInt((1 - t) * x0 + t * x1, 10);
 // RGB colors
 const red = [244, 67, 54];
-const blue = [30, 136, 229];
-const purple = [103, 58, 183];
+const green = [8, 131, 149];
 
 export default {
   data () {
@@ -45,14 +45,21 @@ export default {
             label: 'History',
             icon: this.md ? null : 'ion-film-marker',
             page: History,
-            theme: purple
+            theme: green
           },
         {
             label: 'Home',
             icon: this.md ? null : 'ion-home',
             page: Home,
-            theme: red
-        }
+            theme: green
+        },
+        {
+            label: 'Profil',
+            icon: this.md ? null : 'md-account-circle',
+            page: Profil,
+            theme: green
+        },
+
       ]
     };
   },
@@ -92,7 +99,7 @@ export default {
       }
     },
     title() {
-      return this.md ? 'Onsen UI' : this.tabs[this.index].title || this.tabs[this.index].label;
+      return this.md ? 'Absensi' : this.tabs[this.index].title || this.tabs[this.index].label;
     },
     swipeTheme() {
       return this.md && {

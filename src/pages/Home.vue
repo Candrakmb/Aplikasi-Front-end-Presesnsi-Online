@@ -1,7 +1,7 @@
 <template>
   <v-ons-page>
     <p class="intro">
-      Selamat datang budi berikut kegiatan untuk anda .<br><br>
+      Selamat datang budi nip: 1290837 berikut kegiatan untuk anda .<br><br>
     </p>
 
     <v-ons-card v-for="page of pages" :key="page.label"

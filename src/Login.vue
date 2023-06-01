@@ -33,6 +33,9 @@
 
 <script>
 import eventBus from './eventBus';
+import axios from 'axios';
+import bcrypt from 'bcryptjs';
+
 export default {
   data() {
     return {
@@ -42,22 +45,32 @@ export default {
     };
   },
   methods: {
-    login() {
-      // Periksa kredensial pengguna di sini
-      
-      if (this.username === 'user' && this.password === 'user') {
-        // Berhasil login, lakukan tindakan yang diperlukan
-        eventBus.$emit('loginSuccess', true);
-        console.log('Login berhasil');
-      } else {
-        // Gagal login, tampilkan pesan kesalahan atau lakukan tindakan lainnya
-        console.log('Gagal login');
+    async login() {
+          try {
+            const response = await axios.get('http://127.0.0.1:8000/api/users');
+            const users = response.data.data;
+            console.log(users);
+            // Temukan pengguna dengan email yang cocok
+            const user = users.find((user) => user.email === this.username);
+
+            if (user && bcrypt.compareSync(this.password, user.password)) {
+              // Berhasil login, lakukan tindakan yang diperlukan
+              eventBus.$emit('loginSuccess', true);
+              console.log('Login berhasil');
+              
+              localStorage.setItem('userId', user.id);
+            } else {
+              // Gagal login, tampilkan pesan kesalahan atau lakukan tindakan lainnya
+              console.log('Gagal login');
+            }
+          } catch (error) {
+            console.error('Terjadi kesalahan saat mengambil data pengguna', error);
+          }
+        },
+        togglePasswordVisibility() {
+          this.passwordFieldType = this.passwordFieldType === 'password' ? 'text' : 'password';
+        }
       }
-    },
-    togglePasswordVisibility() {
-      this.passwordFieldType = this.passwordFieldType === 'password' ? 'text' : 'password';
-    }
-  }
 };
 </script>
 

@@ -22,35 +22,33 @@
       </v-ons-list-item>
     </v-ons-list>
 
-    <!-- <v-ons-list-title>Links</v-ons-list-title>
+    <v-ons-list-title>Logout</v-ons-list-title>
     <v-ons-list>
-      <v-ons-list-item v-for="item in links" :key="item.title"
-        :modifier="md ? 'nodivider' : ''"
-        @click="loadLink(item.url)"
-      >
+      <v-ons-list-item @click="logout" modifier="nodivider">
         <div class="left">
-          <v-ons-icon fixed-width class="list-item__icon" :icon="item.icon"></v-ons-icon>
+          <v-ons-icon fixed-width class="list-item__icon" icon="ion-log-out-outline"></v-ons-icon>
         </div>
         <div class="center">
-          {{ item.title }}
+          Logout
         </div>
         <div class="right">
-          <v-ons-icon icon="fa-external-link"></v-ons-icon>
+          <v-ons-icon icon="fa-arrow-right"></v-ons-icon>
         </div>
       </v-ons-list-item>
-    </v-ons-list> -->
+    </v-ons-list>
   </v-ons-page>
 </template>
 
 <script>
+import eventBus from '../eventBus';
 export default {
   methods: {
     loadView(index) {
       this.$store.commit('tabbar/set', index + 1);
       this.$store.commit('splitter/toggle');
     },
-    loadLink(url) {
-      window.open(url, '_blank');
+    logout() {
+      eventBus.$emit('logout', true);
     }
   },
   data() {

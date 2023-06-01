@@ -12,7 +12,10 @@
     "deploy": "npm run build && npm run demo:index && gh-pages -d www"
   },
   "dependencies": {
-    "gh-pages": "^1.2.0",
+    "axios": "^1.4.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "bcryptjs": "^2.4.3",
+    "gh-pages": "^5.0.0",
     "leaflet": "^1.9.3",
     "onsenui": "^2.10.2",
     "vue": "^2.5.3",
@@ -22,7 +25,7 @@
   },
   "devDependencies": {
     "babel-core": "^6.0.0",
-    "babel-loader": "^6.0.0",
+    "babel-loader": "^7.1.5",
     "babel-plugin-external-helpers": "^6.22.0",
     "babel-preset-env": "^1.6.1",
     "copy-webpack-plugin": "^4.0.1",

@@ -20,7 +20,6 @@
   <script>
   import L from 'leaflet';
   import personIcon from '../assets/person.png';
-  import lokasi from '../assets/location.png';
   import { kabupatenBojonegoro } from '../assets/mapping/bojonegoro.js';
   import { test } from '../assets/mapping/test.js';
   export default {
@@ -36,6 +35,7 @@
       geojson: null,
     };
   },
+
   mounted() {
     // inisialisasi peta
     this.map = L.map('map').setView([-7.152337581949617,111.88643465470935], 1);
@@ -43,11 +43,7 @@
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(this.map);
 
-    // this.data = L.geoJSON(kabupatenBojonegoro, {
-    //     filter: function(feature) {
-    //         return feature.properties.name === 'ngraho_ngraho';
-    //     }
-    // }).addTo(this.map);
+    // this.data = L.geoJSON(kabupatenBojonegoro).addTo(this.map);
     this.data = L.geoJSON(test, {
         filter: function(feature) {
             return feature.properties.name === 'surabaya_surabaya';
