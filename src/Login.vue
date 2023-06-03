@@ -10,7 +10,7 @@
           <v-ons-list-item>
             <div class="login-input">
               <v-ons-icon icon="md-account" class="login-icon"></v-ons-icon>
-              <v-ons-input  v-model="username" modifier="underbar" placeholder="Username" float></v-ons-input>
+              <v-ons-input  v-model="email" modifier="underbar" placeholder="Email" float></v-ons-input>
             </div>
           </v-ons-list-item>
           
@@ -34,12 +34,11 @@
 <script>
 import eventBus from './eventBus';
 import axios from 'axios';
-import bcrypt from 'bcryptjs';
 
 export default {
   data() {
     return {
-      username: '',
+      email: '',
       password: '',
       passwordFieldType: 'password'
     };
@@ -47,24 +46,23 @@ export default {
   methods: {
     async login() {
           try {
-            const response = await axios.get('http://127.0.0.1:8000/api/users');
-            const users = response.data.data;
-            console.log(users);
-            // Temukan pengguna dengan email yang cocok
-            const user = users.find((user) => user.email === this.username);
+            const response = await axios.post('http://127.0.0.1:8000/api/login', {
+              email: this.email,
+              password: this.password
+            });
 
-            if (user && bcrypt.compareSync(this.password, user.password)) {
-              // Berhasil login, lakukan tindakan yang diperlukan
+            const token = response.data.token;
+            if (token) {
+              // Login berhasil, simpan token API di local storage atau cookie
+              localStorage.setItem('token', token);
+              // Redirect ke halaman beranda atau halaman lain yang sesuai
               eventBus.$emit('loginSuccess', true);
-              console.log('Login berhasil');
-              
-              localStorage.setItem('userId', user.id);
             } else {
               // Gagal login, tampilkan pesan kesalahan atau lakukan tindakan lainnya
               console.log('Gagal login');
             }
           } catch (error) {
-            console.error('Terjadi kesalahan saat mengambil data pengguna', error);
+            console.error('Terjadi kesalahan saat login', error);
           }
         },
         togglePasswordVisibility() {

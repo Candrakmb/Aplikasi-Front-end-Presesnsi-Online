@@ -1,19 +1,29 @@
 <template>
     <v-ons-page>
       <custom-toolbar v-bind="toolbarInfo"></custom-toolbar>
-
-      <v-ons-card >
-        <div class="title">
-        penyuluhan di......
+      <div id="map" ></div>
+      <div :hidden="buttonActive" class="card_alert">
+          <div class="content_alert">
+              <v-ons-icon icon="ion-alert-circled"></v-ons-icon>
+            <span>Anda di luar Area Atau Belum Harinya</span>
+            </div>
+          </div>
+      <div class="card">
+        <div class="kalender">
+                <div class="card-description nama_bulan" >{{ bulan }}</div>
+                <div class="card-description nama_hari">{{ hari }}</div>
+                <div class="card-description tanggal">{{ tanggal }}</div>
+                <div class="card-description tahun">{{ tahun }}</div>
+            </div>
+            <div class="informasi">
+              <div class="card-title">{{ kegiatan }}</div>
+              <div class="card-subtitle"><v-ons-icon icon="ion-map"></v-ons-icon>
+              <span>{{ kecamatan }}, {{ desa }}</span></div>
+            </div>
+            <div class="button_absensi">
+              <v-ons-button modifier="large" :disabled="!buttonActive" style="margin: 6px 0">Absen</v-ons-button>
+            </div>
       </div>
-      <div class="content">
-        <div id="map" style="width: auto; height: 300px;"></div>
-        <div class="peringatan">
-          <span :hidden="buttonActive" class="alert error">Anda di luar area!</span>
-        </div>
-        <v-ons-button modifier="large" :disabled="!buttonActive" style="margin: 6px 0">Absen</v-ons-button>
-      </div>
-      </v-ons-card>
     </v-ons-page>
   </template>
   
@@ -32,11 +42,15 @@
       buttonActive: false,
       userlatlng: null, // inisialisasi koordinat pengguna
       data: null,
+      mapping:null,
       geojson: null,
+      executionDate: null,
     };
   },
 
   mounted() {
+    const { user_id, kecamatan, desa, kegiatan, checkDate} = this.$data;
+    this.executionDate= checkDate;
     // inisialisasi peta
     this.map = L.map('map').setView([-7.152337581949617,111.88643465470935], 1);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -44,7 +58,7 @@
     }).addTo(this.map);
 
     // this.data = L.geoJSON(kabupatenBojonegoro).addTo(this.map);
-    this.data = L.geoJSON(test, {
+    this.mapping = L.geoJSON(test, {
         filter: function(feature) {
             return feature.properties.name === 'surabaya_surabaya';
         }
@@ -103,7 +117,7 @@
           })
         }).addTo(this.map); 
         
-        this.map.setView(this.userlatlng, 13);
+        this.map.setView(this.userlatlng, 15);
   
         // Panggil fungsi untuk mengecek jarak dan lokasi pengguna
         this.checkUserLocation(this.userlatlng);
@@ -117,11 +131,21 @@
 },
 
   checkUserLocation(userLatLng) {
-    this.buttonActive = this.data.getBounds().contains(userLatLng);
-    if (!this.buttonActive) {
-        this.$ons.notification.toast('Anda di Luar Area!', { timeout: 2000, animation: 'fall' });
-      }
+    const isLocationValid = this.mapping.getBounds().contains(userLatLng);
+
+    const today = new Date();
+    const executionDate = new Date(this.executionDate); // Tambahkan ini
+      const isExecutionDateToday =
+      today.getDate() === executionDate.getDate() && // Perbaiki ini
+        today.getMonth() === executionDate.getMonth() && // Perbaiki ini
+        today.getFullYear() === executionDate.getFullYear(); // Perbaiki ini
+
+      // Memeriksa apakah lokasi dan tanggal saat ini sesuai
+      this.buttonActive = isLocationValid && isExecutionDateToday;
+      console.log(isExecutionDateToday);
+      console.log(isLocationValid);
   },
+
 
     // haversineDistance(lat1, lon1, lat2, lon2) {
     //     const R = 6371e3; // radius bumi dalam meter
@@ -143,7 +167,7 @@
 };
   </script>
   
-  <style>
+  <style scoped>
   .intro {
     text-align: left;
     padding: 0 22px;
@@ -152,44 +176,126 @@
     line-height: 1.4;
     color: rgba(0, 0, 0, .54);
   }
+  #map {
+    width: 100%;
+    height: 100%;
+    left: 0px;
+    top: 0px;
+    position: absolute;
+    z-index: -1;
+  }
   
-  ons-card {
-    cursor: pointer;
-    color: #333;
+  .card{
+    display: grid;
+    grid-template-areas: 'kalender informasi'
+    'button button';
+    position: absolute;
+    width: 95%;
+    height: auto;
+    margin-top: 450px;
+    background: #fff;
   }
   
   .card__title, .card--material__title {
     font-size: 20px;
   }
 
-  .leaflet-marker-icon,
-.leaflet-marker-shadow {
-  margin-top: -12px;
-  margin-left: -12px;
-  width: 25px;
-  height: 41px;
+  .card_alert{
+    position: fixed;
+    margin-top: 90px;
+    margin-left: 10px;
+    width: 95%;
+    height: 30px;
+    background: #f80303 ;
+    border-radius: 20px;
+    box-shadow: 0 8px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  .content_alert{
+    display: grid;
+    grid-template-columns: auto auto;
+    justify-content: center;
+    padding: 5px;
+  }
+  .card_alert .ons-icon{
+    margin-right: 20px;
+    color: white;
+  }
+  
+  .card_alert span{
+    font-weight: 600;
+    color: #fff;
+  }
+  .card_alert .ons-icon{
+      margin-top: 3px;
+  }
+
+  .kalender {
+  margin-right: 20px;
+  margin-left: 5px;
+  grid-area: kalender;
+  position: relative;
+  width: 100px;
+  background: #fff;
+  text-align: center;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 10px 4px rgba(0, 0, 0, 0.2);
+}
+.kalender .nama_bulan{
+  position: relative;
+  padding: 5px 10px;
+  background: #05BFDB;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+}
+.kalender .nama_hari{
+  margin-top: 5px;
+  font-size: 12px;
+  font-weight: 300;
+  color: #999;
+}
+.kalender .tanggal{
+  margin-top: 0px;
+  line-height: 1em;
+  font-size: 30px;
+  font-weight: 700;
+  color:#333;
+}
+.kalender .tahun{
+  margin-bottom: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  color:#999;
+}
+.informasi{
+  grid-area: informasi;
+ justify-content: center;
 }
 
-/* Mengubah posisi ikon bayangan marker */
-.leaflet-marker-shadow {
-  z-index: -1;
-  width: 41px;
-  height: 41px;
-  margin-top: -10px;
-  margin-left: -12px;
+.card-title {
+  margin-top: 15px;
+  font-weight: 800;
+  font-size: 18px;
 }
-.peringatan{
- padding: 20px;
+
+.card-subtitle {
+  display: grid;
+  grid-template-columns: auto auto;
+  font-size: 14px;
+  color: #777;
+  margin-top: 15px;
 }
-.alert {
-  padding: 10px;
-  text-align: center;
-  position: relative;
-  color: white;
-  border-radius: 5px;
-  margin-left: 80px;
-  box-shadow: 10px 5px;
+
+.card-description {
+  font-size: 12px;
+  color: #777;
+  margin-bottom: 5px;
 }
-.error {background-color: #c90b0b;} /* Green */
+.button_absensi{
+  margin-top: 15px;
+  grid-area: button;
+}
   </style>
   

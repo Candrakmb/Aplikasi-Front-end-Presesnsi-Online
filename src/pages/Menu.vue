@@ -1,7 +1,7 @@
 <template>
   <v-ons-page modifier="white">
     <div class="profile-pic">
-      <img src="../assets/vue-onsenui.png">
+      <img src="../assets/Logo-Kabupaten-Bojonegoro.png">
     </div>
 
     <v-ons-list-title>Access</v-ons-list-title>
@@ -47,8 +47,22 @@ export default {
       this.$store.commit('tabbar/set', index + 1);
       this.$store.commit('splitter/toggle');
     },
-    logout() {
-      eventBus.$emit('logout', true);
+    async logout() {
+      try {
+        const token = localStorage.getItem('token');
+        
+        await axios.post('http://127.0.0.1:8000/api/logout', {}, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        // Melakukan logout, menghapus token API dan ID pengguna dari local storage
+        localStorage.removeItem('token');
+        // Emit event ke eventBus untuk memberitahu komponen lain
+        eventBus.$emit('logout', true);
+      } catch (error) {
+        console.error('Terjadi kesalahan saat logout', error);
+      }
     }
   },
   data() {

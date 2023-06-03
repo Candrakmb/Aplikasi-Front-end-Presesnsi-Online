@@ -4,7 +4,7 @@
       <div class="profile-header-bg"></div>
       <v-ons-row>
         <v-ons-col width="100%">
-          <h1 class="profile-name">Nama Anda</h1>
+          <h1 class="profile-name">{{ nama }}</h1>
         </v-ons-col>
       </v-ons-row>
       <v-ons-row>
@@ -48,18 +48,52 @@
    
   <script>
   import eventBus from '../eventBus';
+  import axios from 'axios';
   export default {
     data() {
       return {
-        nama: "John Doe",
+        nama: "",
         nip: "1234567890",
-        alamat: "Jl. Contoh Alamat, Kota, Negara",
+        alamat: "",
       };
     },
+    created() {
+      this.getData();
+    },
     methods: {
-    logout() {
-      eventBus.$emit('logout', true);
-    }
+      async getData() {
+        const token = localStorage.getItem('token');
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        };
+          try {
+            const response = await axios.get('http://127.0.0.1:8000/api/user', config);
+            const { name, address } = response.data; // Mendapatkan nama dan alamat dari respons API
+            this.nama = name; // Memperbarui nilai data nama dengan nilai dari API
+            this.alamat = address; // Memperbarui nilai data alamat dengan nilai dari API
+          } catch (error) {
+            console.error('Terjadi kesalahan saat mengambil data', error);
+          }
+      },
+      async logout() {
+      try {
+        const token = localStorage.getItem('token');
+        
+        await axios.post('http://127.0.0.1:8000/api/logout', {}, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        // Melakukan logout, menghapus token API dan ID pengguna dari local storage
+        localStorage.removeItem('token');
+        // Emit event ke eventBus untuk memberitahu komponen lain
+        eventBus.$emit('logout', true);
+      } catch (error) {
+        console.error('Terjadi kesalahan saat logout', error);
+      }
+      }
     },
   };
   </script>
