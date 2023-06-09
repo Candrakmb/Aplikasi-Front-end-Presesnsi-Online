@@ -2,7 +2,7 @@
   <v-ons-page>
     <custom-toolbar v-bind="toolbarInfo"></custom-toolbar>
     
-    <v-ons-list v-if="textKosong === false" style="margin-top: 10px;" >
+    <v-ons-list style="margin-top: 10px;" >
       <v-ons-list-item>
         <div class="center">
 

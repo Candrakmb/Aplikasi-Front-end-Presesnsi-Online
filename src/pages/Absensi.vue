@@ -21,7 +21,7 @@
               <span>{{ hanyaDesa }}, {{ kecamatan }}</span></div>
             </div>
             <div class="button_absensi">
-              <v-ons-button modifier="large"  style="margin: 6px 0" @click="submitAttendance" >Absen</v-ons-button>
+              <v-ons-button modifier="large" :disabled="!buttonActive" style="margin: 6px 0" @click="submitAttendance" >Absen</v-ons-button>
             </div>
       </div>
       <v-ons-alert-dialog style="
@@ -56,7 +56,7 @@
       mapping:null,
       geojson: null,
       executionDate: null,
-      alertDialogVisible: true,
+      alertDialogVisible: false,
     };
   },
 
