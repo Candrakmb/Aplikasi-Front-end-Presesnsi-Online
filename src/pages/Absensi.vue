@@ -16,22 +16,33 @@
                 <div class="card-description tahun">{{ tahun }}</div>
             </div>
             <div class="informasi">
-              <div class="card-title">{{ kegiatan }}</div>
+              <div class="card-title">{{ keterangan }}</div>
               <div class="card-subtitle"><v-ons-icon icon="ion-map"></v-ons-icon>
-              <span>{{ kecamatan }}, {{ desa }}</span></div>
+              <span>{{ hanyaDesa }}, {{ kecamatan }}</span></div>
             </div>
             <div class="button_absensi">
-              <v-ons-button modifier="large" :disabled="!buttonActive" style="margin: 6px 0">Absen</v-ons-button>
+              <v-ons-button modifier="large"  style="margin: 6px 0" @click="submitAttendance" >Absen</v-ons-button>
             </div>
       </div>
+      <v-ons-alert-dialog style="
+      text-align: center;" modifier="rowfooter" :visible.sync="alertDialogVisible">
+          <span class="title-alert">Absen</span><br><br>
+          <span class="subtitle-alert">Absensi Berhasil</span>
+          <template slot="footer">
+            <v-ons-back-button @click="closeAlertDialog()">Back</v-ons-back-button>
+          </template>
+    </v-ons-alert-dialog>
+    
     </v-ons-page>
   </template>
   
   <script>
   import L from 'leaflet';
+  import Home from './Home.vue';
   import personIcon from '../assets/person.png';
   import { kabupatenBojonegoro } from '../assets/mapping/bojonegoro.js';
   import { test } from '../assets/mapping/test.js';
+  import axios from 'axios';
   export default {
  
   data() {
@@ -45,22 +56,26 @@
       mapping:null,
       geojson: null,
       executionDate: null,
+      alertDialogVisible: true,
     };
   },
 
   mounted() {
-    const { user_id, kecamatan, desa, kegiatan, checkDate} = this.$data;
+    const { kecamatan, desa, kegiatan, checkDate} = this.$data;
     this.executionDate= checkDate;
+    
     // inisialisasi peta
-    this.map = L.map('map').setView([-7.152337581949617,111.88643465470935], 1);
+    this.map = L.map('map', {
+                zoomControl: false
+              }).setView([-7.152337581949617,111.88643465470935], 1);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(this.map);
 
     // this.data = L.geoJSON(kabupatenBojonegoro).addTo(this.map);
-    this.mapping = L.geoJSON(test, {
+    this.mapping = L.geoJSON(kabupatenBojonegoro, {
         filter: function(feature) {
-            return feature.properties.name === 'surabaya_surabaya';
+            return feature.properties.name === desa;
         }
     }).addTo(this.map);
 
@@ -78,6 +93,53 @@
         setInterval(() => this.getUserPosition(), 5000);
   },
   methods: {
+    closeAlertDialog() {
+      this.alertDialogVisible = false;
+    },
+    async submitAttendance() {
+          const { user_id, taskDetailsId } = this.$data;
+          const postData = {
+            id: user_id,
+            taskdetails_id: taskDetailsId,
+            latitude: null,
+            longitude: null
+          };
+
+          try {
+            const token = localStorage.getItem('token');
+            const config = {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            };
+
+            
+
+            // Mendapatkan posisi geografis pengguna
+            navigator.geolocation.getCurrentPosition(
+              position => {
+                postData.latitude = position.coords.latitude;
+                postData.longitude = position.coords.longitude;
+
+                // Kirim data posisi dan informasi hadir ke server
+                axios.post('http://127.0.0.1:8000/api/attendance/post', postData, config)
+                  .then(response => {
+                    this.alertDialogVisible = true;
+                  })
+
+                  .catch(error => {
+                    console.error(error);
+                  });
+              },
+              error => {
+                console.error(error);
+              }
+            );
+           
+          } catch (error) {
+            console.error(error);
+          }
+      },
     generateCirclePolygon() {
       var angleStep = (2 * Math.PI) / this.numPoints;
 
@@ -93,12 +155,12 @@
     },
 
     getUserPosition() {
-  navigator.geolocation.getCurrentPosition(
-    position => {
-      const userLatLng = L.latLng(
-        position.coords.latitude,
-        position.coords.longitude
-      );
+      navigator.geolocation.getCurrentPosition(
+        position => {
+          const userLatLng = L.latLng(
+            position.coords.latitude,
+            position.coords.longitude
+          );
       
       if (!this.userlatlng || !this.userlatlng.equals(userLatLng)) {
         // Hanya lakukan pengaturan ulang tampilan jika posisi pengguna berubah
@@ -142,39 +204,29 @@
 
       // Memeriksa apakah lokasi dan tanggal saat ini sesuai
       this.buttonActive = isLocationValid && isExecutionDateToday;
-      console.log(isExecutionDateToday);
-      console.log(isLocationValid);
   },
 
-
-    // haversineDistance(lat1, lon1, lat2, lon2) {
-    //     const R = 6371e3; // radius bumi dalam meter
-    //     const phi1 = lat1 * Math.PI / 180;
-    //     const phi2 = lat2 * Math.PI / 180;
-    //     const deltaPhi = (lat2 - lat1) * Math.PI / 180;
-    //     const deltaLambda = (lon2 - lon1) * Math.PI / 180;
-
-    //     const a = Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
-    //     Math.cos(phi1) * Math.cos(phi2) *
-    //     Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
-    //     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-    //     const distance = R * c;
-    //     return distance;
-    //   }
+    push(page) {
+        this.$store.commit('navigator/push', {
+            extends: page,
+        });
+       }
   }
   
 };
   </script>
   
   <style scoped>
-  .intro {
-    text-align: left;
-    padding: 0 22px;
-    margin-top: 20px;
-    font-size: 14px;
-    line-height: 1.4;
-    color: rgba(0, 0, 0, .54);
+  .title-alert{
+    font-size: 20px;
+    font-weight: 600;
+    margin-left: 37%;
+    margin-right: auto;
+
+  }
+  .subtitle-alert{
+    margin-left: 23%;
+    margin-right: auto;
   }
   #map {
     width: 100%;
@@ -192,7 +244,6 @@
     position: absolute;
     width: 95%;
     height: auto;
-    margin-top: 450px;
     background: #fff;
   }
   
@@ -202,7 +253,7 @@
 
   .card_alert{
     position: fixed;
-    margin-top: 90px;
+    margin-top: 250px;
     margin-left: 10px;
     width: 95%;
     height: 30px;

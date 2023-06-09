@@ -1,5 +1,6 @@
 <template>
   <v-ons-page>
+    <v-ons-progress-bar v-if="isLoading" indeterminate></v-ons-progress-bar>
     <div class="login-container">
       <div class="login-logo">
         <img src="./assets/Logo-Kabupaten-Bojonegoro.png" alt="Logo">
@@ -40,12 +41,14 @@ export default {
     return {
       email: '',
       password: '',
-      passwordFieldType: 'password'
+      passwordFieldType: 'password',
+      isLoading: false
     };
   },
   methods: {
     async login() {
           try {
+            this.isLoading = true;
             const response = await axios.post('http://127.0.0.1:8000/api/login', {
               email: this.email,
               password: this.password
@@ -63,6 +66,8 @@ export default {
             }
           } catch (error) {
             console.error('Terjadi kesalahan saat login', error);
+          }finally {
+            this.isLoading = false;
           }
         },
         togglePasswordVisibility() {

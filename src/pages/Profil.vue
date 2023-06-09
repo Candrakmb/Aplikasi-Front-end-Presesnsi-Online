@@ -53,7 +53,7 @@
     data() {
       return {
         nama: "",
-        nip: "1234567890",
+        nip: "",
         alamat: "",
       };
     },
@@ -69,10 +69,10 @@
           },
         };
           try {
-            const response = await axios.get('http://127.0.0.1:8000/api/user', config);
-            const { name, address } = response.data; // Mendapatkan nama dan alamat dari respons API
-            this.nama = name; // Memperbarui nilai data nama dengan nilai dari API
-            this.alamat = address; // Memperbarui nilai data alamat dengan nilai dari API
+            const response = await axios.get('http://127.0.0.1:8000/api/pengguna', config);
+            this.nama = response.data[0].pegawai.name; // Memperbarui nilai data nama dengan nilai dari API
+            this.alamat = response.data[0].pegawai.address;
+            this.nip= response.data[0].pegawai.nip;// Memperbarui nilai data alamat dengan nilai dari API
           } catch (error) {
             console.error('Terjadi kesalahan saat mengambil data', error);
           }

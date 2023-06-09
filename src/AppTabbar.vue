@@ -43,7 +43,7 @@ export default {
       tabs: [
         {
             label: 'History',
-            icon: this.md ? null : 'ion-film-marker',
+            icon: this.md ? null : 'ion-archive',
             page: History,
             theme: green
           },
@@ -59,7 +59,6 @@ export default {
             page: Profil,
             theme: green
         },
-
       ]
     };
   },

@@ -26,7 +26,7 @@
     <v-ons-list>
       <v-ons-list-item @click="logout" modifier="nodivider">
         <div class="left">
-          <v-ons-icon fixed-width class="list-item__icon" icon="ion-log-out-outline"></v-ons-icon>
+          <v-ons-icon fixed-width class="list-item__icon" icon="ion-log-out"></v-ons-icon>
         </div>
         <div class="center">
           Logout
@@ -41,6 +41,7 @@
 
 <script>
 import eventBus from '../eventBus';
+import axios from 'axios';
 export default {
   methods: {
     loadView(index) {
@@ -69,12 +70,16 @@ export default {
     return {
       access: [
         {
-          title: 'Home',
-          icon: 'ion-home, material:md-home'
+          title: 'History',
+          icon: 'ion-archive, material: md-archive'
         },
         {
-          title: 'History',
-          icon: 'ion-film-marker, material: md-movie-alt'
+          title: 'Home',
+          icon: 'ion-home, material: md-home'
+        },
+        {
+          title: 'Profil',
+          icon: 'ion-person, material: md-person'
         },
       ]
     };
