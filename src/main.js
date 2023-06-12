@@ -14,6 +14,7 @@ import AppNavigator from './AppNavigator.vue';
 import Login from './Login.vue'
 import 'leaflet/dist/leaflet.css';
 import eventBus from './eventBus';
+import swRegister from './assets/sw-register';
 
 Vue.use(Vuex);
 Vue.use(VueOnsen);
@@ -47,6 +48,7 @@ new Vue({
   },
   created() {
     const loggedInStatus = localStorage.getItem('loggedIn');
+    swRegister();
 
     // Jika ada status login yang tersimpan, gunakan nilainya
     if (loggedInStatus) {

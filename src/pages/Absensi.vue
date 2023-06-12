@@ -21,7 +21,7 @@
               <span>{{ hanyaDesa }}, {{ kecamatan }}</span></div>
             </div>
             <div class="button_absensi">
-              <v-ons-button modifier="large" :disabled="!buttonActive" style="margin: 6px 0" @click="submitAttendance" >Absen</v-ons-button>
+              <v-ons-button modifier="large"  style="margin: 6px 0" @click="submitAttendance" >Absen</v-ons-button>
             </div>
       </div>
       <v-ons-alert-dialog style="
@@ -88,9 +88,7 @@
           // Panggil fungsi untuk memeriksa jarak dan lokasi pengguna
           this.checkUserLocation(userlatlng);
         });
-
-        // Perbarui lokasi pengguna setiap 5 detik
-        setInterval(() => this.getUserPosition(), 5000);
+        
   },
   methods: {
     closeAlertDialog() {

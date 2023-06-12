@@ -4,6 +4,7 @@ var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var CopyWebpackPlugin = require('copy-webpack-plugin');
 
+
 var browserTargets = [
   '> 1%',
   'iOS >= 8.0',
@@ -21,11 +22,13 @@ var babelOptions = {
 
 module.exports = {
   watch: process.env.WEBPACK_WATCH === 'true',
-  entry: './src/main.js',
-  output: {
-    path: path.resolve(__dirname, './www'),
-    publicPath: '',
-    filename: 'build.js'
+  entry: {
+    app: path.resolve(__dirname, 'src/main.js'),
+    sw: path.resolve(__dirname, 'src/assets/sw.js'),
+  },
+   output: {
+    filename: '[name].bundle.js',
+    path: path.resolve(__dirname, 'dist'),
   },
   module: {
     rules: [
@@ -86,7 +89,7 @@ module.exports = {
       template: 'src/index.html'
     }),
     new CopyWebpackPlugin([{
-      from: 'static/'
+      from: 'public/'
     }])
   ],
   resolve: {
@@ -116,12 +119,6 @@ if (process.env.NODE_ENV === 'production') {
     new webpack.DefinePlugin({
       'process.env': {
         NODE_ENV: '"production"'
-      }
-    }),
-    new webpack.optimize.UglifyJsPlugin({
-      sourceMap: true,
-      compress: {
-        warnings: false
       }
     }),
     new webpack.LoaderOptionsPlugin({

@@ -49,23 +49,23 @@ export default {
     async login() {
           try {
             this.isLoading = true;
-            const response = await axios.post('http://127.0.0.1:8000/api/login', {
+            const response = await axios.post('https://penyuluhandkpp.000webhostapp.com/api/login', {
               email: this.email,
               password: this.password
             });
-
-            const token = response.data.token;
-            if (token) {
-              // Login berhasil, simpan token API di local storage atau cookie
-              localStorage.setItem('token', token);
-              // Redirect ke halaman beranda atau halaman lain yang sesuai
-              eventBus.$emit('loginSuccess', true);
-            } else {
-              // Gagal login, tampilkan pesan kesalahan atau lakukan tindakan lainnya
-              console.log('Gagal login');
-            }
+            console.log(response);
+            // const token = response.data.token;
+            // if (token) {
+            //   // Login berhasil, simpan token API di local storage atau cookie
+            //   localStorage.setItem('token', token);
+            //   // Redirect ke halaman beranda atau halaman lain yang sesuai
+            //   eventBus.$emit('loginSuccess', true);
+            // } else {
+            //   // Gagal login, tampilkan pesan kesalahan atau lakukan tindakan lainnya
+            //   console.log('Gagal login');
+            // }
           } catch (error) {
-            console.error('Terjadi kesalahan saat login', error);
+            console.log(error)
           }finally {
             this.isLoading = false;
           }
