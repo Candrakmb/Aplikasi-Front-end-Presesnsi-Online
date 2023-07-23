@@ -42,6 +42,7 @@
 <script>
 import eventBus from '../eventBus';
 import axios from 'axios';
+import baseUrl from '../api.js';
 export default {
   methods: {
     loadView(index) {
@@ -51,8 +52,9 @@ export default {
     async logout() {
       try {
         const token = localStorage.getItem('token');
+        const apiUrl = `${baseUrl}/logout`;
         
-        await axios.post('http://127.0.0.1:8000/api/logout', {}, {
+        await axios.post(apiUrl, {}, {
           headers: {
             Authorization: `Bearer ${token}`
           }

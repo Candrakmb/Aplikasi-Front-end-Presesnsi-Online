@@ -42,6 +42,7 @@
 </template>
 <script>
 import axios from 'axios';
+import baseUrl from '../api.js';
 export default {
   data() {
     return {
@@ -71,6 +72,7 @@ export default {
     async fetchData() {
       try {
         const token = localStorage.getItem('token');
+        const apiUrl = `${baseUrl}/tasks/history`;
         const config = {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -80,7 +82,7 @@ export default {
               year: this.selectedYear,
           },
         };
-        const response = await axios.get('http://127.0.0.1:8000/api/tasks/history', config);
+        const response = await axios.get(apiUrl, config);
         const tasks = response.data.tasks;
         const taskDetails = response.data.task_details;
 

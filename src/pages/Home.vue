@@ -59,6 +59,8 @@
 <script>
 import Absensi from './absensi.vue';
 import axios from 'axios';
+import baseUrl from '../api.js';
+
 
 export default {
   data() {
@@ -83,13 +85,14 @@ export default {
   methods: {
     async getData() {
         const token = localStorage.getItem('token');
+        const apiUrl = `${baseUrl}/pengguna`;
         const config = {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         };
           try {
-            const response = await axios.get('http://127.0.0.1:8000/api/pengguna', config);
+            const response = await axios.get(apiUrl, config);
             this.nama = response.data[0].pegawai.name; // Memperbarui nilai data nama dengan nilai dari API
             this.nip= response.data[0].pegawai.nip;// Memperbarui nilai data alamat dengan nilai dari API
           } catch (error) {
@@ -99,12 +102,13 @@ export default {
     async fetchData() {
       try {
         const token = localStorage.getItem('token');
+        const apiUrl = `${baseUrl}/tasks`;
         const config = {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         };
-        const response = await axios.get('http://127.0.0.1:8000/api/tasks', config);
+        const response = await axios.get(apiUrl, config);
         const tasks = response.data.tasks;
         const taskDetails = response.data.task_details;
 

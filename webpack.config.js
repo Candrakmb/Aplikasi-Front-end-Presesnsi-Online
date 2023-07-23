@@ -88,9 +88,12 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: 'src/index.html'
     }),
-    new CopyWebpackPlugin([{
-      from: 'public/'
-    }])
+    new CopyWebpackPlugin([
+      {
+        from: path.resolve(__dirname, 'src/public/'),
+        to: path.resolve(__dirname, 'dist/'),
+      },
+    ]),
   ],
   resolve: {
     alias: {

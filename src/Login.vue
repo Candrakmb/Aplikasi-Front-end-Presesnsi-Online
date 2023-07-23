@@ -1,6 +1,8 @@
 <template>
   <v-ons-page>
-    <v-ons-progress-bar v-if="isLoading" indeterminate></v-ons-progress-bar>
+    <div v-if="isLoading" class="progress-container">
+    <v-ons-progress-circular indeterminate></v-ons-progress-circular>
+  </div>
     <div class="login-container">
       <div class="login-logo">
         <img src="./assets/Logo-Kabupaten-Bojonegoro.png" alt="Logo">
@@ -29,12 +31,17 @@
         </div>
       </div>
     </div>
+    <v-ons-toast :visible.sync="toastVisible" animation="ascend">
+      Email Atau Password salah
+      <button @click="toastVisible = false">ok</button>
+    </v-ons-toast>
   </v-ons-page>
 </template>
 
 <script>
 import eventBus from './eventBus';
 import axios from 'axios';
+import baseUrl from './api.js';
 
 export default {
   data() {
@@ -42,30 +49,32 @@ export default {
       email: '',
       password: '',
       passwordFieldType: 'password',
-      isLoading: false
+      isLoading: false,
+      toastVisible: false,
     };
   },
   methods: {
     async login() {
           try {
             this.isLoading = true;
-            const response = await axios.post('https://penyuluhandkpp.000webhostapp.com/api/login', {
+            const apiUrl = `${baseUrl}/login`;
+            const response = await axios.post(apiUrl, {
               email: this.email,
               password: this.password
             });
             console.log(response);
-            // const token = response.data.token;
-            // if (token) {
-            //   // Login berhasil, simpan token API di local storage atau cookie
-            //   localStorage.setItem('token', token);
-            //   // Redirect ke halaman beranda atau halaman lain yang sesuai
-            //   eventBus.$emit('loginSuccess', true);
-            // } else {
-            //   // Gagal login, tampilkan pesan kesalahan atau lakukan tindakan lainnya
-            //   console.log('Gagal login');
-            // }
+            const token = response.data.token;
+            if (token) {
+              // Login berhasil, simpan token API di local storage atau cookie
+              localStorage.setItem('token', token);
+              // Redirect ke halaman beranda atau halaman lain yang sesuai
+              eventBus.$emit('loginSuccess', true);
+            } else {
+              console.log('Gagal login');
+            }
           } catch (error) {
-            console.log(error)
+            console.log(error);
+            this.toastVisible=true;
           }finally {
             this.isLoading = false;
           }
@@ -84,6 +93,7 @@ export default {
   align-items: center;
   justify-content: center;
   height: 600px;
+  z-index: -1;
 }
 
 .login-logo {
@@ -131,5 +141,11 @@ ons-list{
 .login-button {
   text-align: center;
   margin-top: 30px;
+}
+.progress-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
 }
 </style>

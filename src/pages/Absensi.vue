@@ -21,7 +21,7 @@
               <span>{{ hanyaDesa }}, {{ kecamatan }}</span></div>
             </div>
             <div class="button_absensi">
-              <v-ons-button modifier="large"  style="margin: 6px 0" @click="submitAttendance" >Absen</v-ons-button>
+              <v-ons-button modifier="large"  :disabled="!buttonActive" style="margin: 6px 0" @click="submitAttendance" >Absen</v-ons-button>
             </div>
       </div>
       <v-ons-alert-dialog style="
@@ -43,6 +43,7 @@
   import { kabupatenBojonegoro } from '../assets/mapping/bojonegoro.js';
   import { test } from '../assets/mapping/test.js';
   import axios from 'axios';
+  import baseUrl from '../api.js';
   export default {
  
   data() {
@@ -105,6 +106,7 @@
 
           try {
             const token = localStorage.getItem('token');
+            const apiUrl = `${baseUrl}/attendance/post`;
             const config = {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -120,7 +122,7 @@
                 postData.longitude = position.coords.longitude;
 
                 // Kirim data posisi dan informasi hadir ke server
-                axios.post('http://127.0.0.1:8000/api/attendance/post', postData, config)
+                axios.post(apiUrl, postData, config)
                   .then(response => {
                     this.alertDialogVisible = true;
                   })

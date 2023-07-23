@@ -49,6 +49,7 @@
   <script>
   import eventBus from '../eventBus';
   import axios from 'axios';
+  import baseUrl from '../api.js';
   export default {
     data() {
       return {
@@ -63,13 +64,14 @@
     methods: {
       async getData() {
         const token = localStorage.getItem('token');
+        const apiUrl = `${baseUrl}/pengguna`;
         const config = {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         };
           try {
-            const response = await axios.get('http://127.0.0.1:8000/api/pengguna', config);
+            const response = await axios.get(apiUrl, config);
             this.nama = response.data[0].pegawai.name; // Memperbarui nilai data nama dengan nilai dari API
             this.alamat = response.data[0].pegawai.address;
             this.nip= response.data[0].pegawai.nip;// Memperbarui nilai data alamat dengan nilai dari API
@@ -78,16 +80,21 @@
           }
       },
       async logout() {
+        const apiUrl = `${baseUrl}/logout`;
       try {
         const token = localStorage.getItem('token');
+        const selectedMonth = localStorage.getItem('selectedMonth');
+        const selectedYear = localStorage.getItem('selectedYear');
         
-        await axios.post('http://127.0.0.1:8000/api/logout', {}, {
+        await axios.post(apiUrl, {}, {
           headers: {
             Authorization: `Bearer ${token}`
           }
         });
         // Melakukan logout, menghapus token API dan ID pengguna dari local storage
         localStorage.removeItem('token');
+        localStorage.removeItem('selectedMonth');
+        localStorage.removeItem('selectedYear');
         // Emit event ke eventBus untuk memberitahu komponen lain
         eventBus.$emit('logout', true);
       } catch (error) {
