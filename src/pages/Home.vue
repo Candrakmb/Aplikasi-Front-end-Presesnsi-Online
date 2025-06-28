@@ -57,7 +57,7 @@
 </template>
 
 <script>
-import Absensi from './absensi.vue';
+import Absensi from './Absensi.vue';
 import axios from 'axios';
 import baseUrl from '../api.js';
 
