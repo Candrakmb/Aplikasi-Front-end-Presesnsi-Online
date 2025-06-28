@@ -44,11 +44,7 @@
   import { test } from '../assets/mapping/test.js';
   import axios from 'axios';
   import baseUrl from '../api.js';
-  import InstallPrompt from '../installprompt/InstallPrompt.vue';
   export default {
-   components: {
-    InstallPrompt
-  },
   data() {
     return {
       map: null,
