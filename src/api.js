@@ -1,3 +1,3 @@
-const baseUrl = 'https://dkpp-bojonegoro.000webhostapp.com/api';
+const baseUrl = 'https://presensiadmin.wirawiriindonesia.com/api';
 
 export default baseUrl;

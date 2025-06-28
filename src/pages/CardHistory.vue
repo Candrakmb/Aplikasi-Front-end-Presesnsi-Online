@@ -72,6 +72,7 @@ export default {
     async fetchData() {
       try {
         const token = localStorage.getItem('token');
+        if (!token) return;
         const apiUrl = `${baseUrl}/tasks/history`;
         const config = {
           headers: {
@@ -85,7 +86,7 @@ export default {
         const response = await axios.get(apiUrl, config);
         const tasks = response.data.tasks;
         const taskDetails = response.data.task_details;
-
+        console.log(response);
         this.pageHistory = [];
 
         if (tasks.length > 0 && taskDetails.length > 0) {

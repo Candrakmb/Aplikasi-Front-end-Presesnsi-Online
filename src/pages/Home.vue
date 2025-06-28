@@ -1,5 +1,6 @@
 <template>
     <v-ons-page>
+      <install-prompt />
       <v-ons-progress-bar v-if="isLoading" indeterminate></v-ons-progress-bar>
       <div class="card-welcome">
         <div class="info-user">
@@ -60,9 +61,12 @@
 import Absensi from './absensi.vue';
 import axios from 'axios';
 import baseUrl from '../api.js';
-
+import InstallPrompt from '../installprompt/InstallPrompt.vue';
 
 export default {
+  components: {
+    InstallPrompt
+  },
   data() {
     return {
       pageToday: [],
@@ -85,6 +89,7 @@ export default {
   methods: {
     async getData() {
         const token = localStorage.getItem('token');
+        if (!token) return;
         const apiUrl = `${baseUrl}/pengguna`;
         const config = {
           headers: {
@@ -102,6 +107,7 @@ export default {
     async fetchData() {
       try {
         const token = localStorage.getItem('token');
+        if (!token) return;
         const apiUrl = `${baseUrl}/tasks`;
         const config = {
           headers: {

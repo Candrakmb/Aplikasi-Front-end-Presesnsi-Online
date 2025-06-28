@@ -35,6 +35,15 @@
       Email Atau Password salah
       <button @click="toastVisible = false">ok</button>
     </v-ons-toast>
+
+ <!-- PWA Install Dialog -->
+    <v-ons-dialog :visible.sync="showPwaDialog">
+      <div style="padding: 20px; text-align: center;">
+        <p>Install aplikasi ini di perangkat Anda untuk pengalaman yang lebih baik.</p>
+        <v-ons-button @click="installPwa">Install</v-ons-button>
+        <v-ons-button modifier="quiet" @click="showPwaDialog = false">Nanti saja</v-ons-button>
+      </div>
+    </v-ons-dialog>
   </v-ons-page>
 </template>
 
@@ -51,7 +60,15 @@ export default {
       passwordFieldType: 'password',
       isLoading: false,
       toastVisible: false,
+      deferredPrompt: null,
+      showPwaDialog: false,
     };
+  },
+  mounted() {
+    window.addEventListener('beforeinstallprompt', this.handleBeforeInstallPrompt);
+  },
+  beforeDestroy() {
+    window.removeEventListener('beforeinstallprompt', this.handleBeforeInstallPrompt);
   },
   methods: {
     async login() {
@@ -62,7 +79,6 @@ export default {
               email: this.email,
               password: this.password
             });
-            console.log(response);
             const token = response.data.token;
             if (token) {
               // Login berhasil, simpan token API di local storage atau cookie
@@ -73,7 +89,6 @@ export default {
               console.log('Gagal login');
             }
           } catch (error) {
-            console.log(error);
             this.toastVisible=true;
           }finally {
             this.isLoading = false;
@@ -81,7 +96,22 @@ export default {
         },
         togglePasswordVisibility() {
           this.passwordFieldType = this.passwordFieldType === 'password' ? 'text' : 'password';
+        },
+    handleBeforeInstallPrompt(e) {
+      e.preventDefault();
+      this.deferredPrompt = e;
+      this.showPwaDialog = true;
+    },
+    async installPwa() {
+      if (this.deferredPrompt) {
+        this.deferredPrompt.prompt();
+        const { outcome } = await this.deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+          this.showPwaDialog = false;
         }
+        this.deferredPrompt = null;
+      }
+    }
       }
 };
 </script>

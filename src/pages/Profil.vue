@@ -64,6 +64,7 @@
     methods: {
       async getData() {
         const token = localStorage.getItem('token');
+        if (!token) return;
         const apiUrl = `${baseUrl}/pengguna`;
         const config = {
           headers: {

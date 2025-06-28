@@ -44,8 +44,11 @@
   import { test } from '../assets/mapping/test.js';
   import axios from 'axios';
   import baseUrl from '../api.js';
+  import InstallPrompt from '../installprompt/InstallPrompt.vue';
   export default {
- 
+   components: {
+    InstallPrompt
+  },
   data() {
     return {
       map: null,
@@ -82,7 +85,7 @@
 
         this.getUserPosition();
 
-        // Mulai mendengarkan perubahan lokasi pengguna setelah mendapatkan lokasi pengguna
+        // mencari perubahan lokasi pengguna setelah mendapatkan lokasi pengguna
         this.map.on('locationfound', e => {
           const userlatlng = e.latlng;
       
@@ -112,9 +115,6 @@
                 Authorization: `Bearer ${token}`,
               },
             };
-
-            
-
             // Mendapatkan posisi geografis pengguna
             navigator.geolocation.getCurrentPosition(
               position => {
@@ -126,7 +126,6 @@
                   .then(response => {
                     this.alertDialogVisible = true;
                   })
-
                   .catch(error => {
                     console.error(error);
                   });
@@ -161,7 +160,6 @@
             position.coords.latitude,
             position.coords.longitude
           );
-      
       if (!this.userlatlng || !this.userlatlng.equals(userLatLng)) {
         // Hanya lakukan pengaturan ulang tampilan jika posisi pengguna berubah
         this.userlatlng = userLatLng;
@@ -169,7 +167,6 @@
         if (this.markerUser) {
           this.map.removeLayer(this.markerUser);
         }
-        
         // Tambahkan marker pengguna baru
         this.markerUser = L.marker(this.userlatlng, {
           icon: L.icon({
